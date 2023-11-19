@@ -184,41 +184,39 @@ async function get_front_resources() {
 
   for (let i = 0; i < machines.length; i++) {
     let n_ = machines[i]?.name?.toLowerCase?.() || ''
+    let fn_ = '';
     
     // Name contains Shard?
     if (n_.includes('shard')) {
-      // console.log(machines[i])
-      let inst = ENDPOINTS.front_resources.buildInstance('shard');
-      inst.set(machines[i])
-      arr.push(inst)
+      fn_ = 'shard'
     }
 
     else if (machines[i].name.includes('load balancer')) {
-      let inst = ENDPOINTS.front_resources.buildInstance('loadbalancer');
-      inst.set(machines[i])
-      arr.push(inst)
+      fn_ = 'loadbalancer'
     }
 
     else if (machines[i].name.includes('batch processing server')) {
-      let inst = ENDPOINTS.front_resources.buildInstance('batchprocessingserver');
-      inst.set(machines[i])
-      arr.push(inst)
+      fn_ = 'batchprocessingserver'
     }
+
+    let inst = ENDPOINTS.front_resources.buildInstance(fn_);
+    inst.set(machines[i])
+    arr.push(inst)
   }
 
   let newObj = {
     machines: arr
   }
-  
+
   return newObj
 }
 
 // @ EXPORTS
 module.exports = {
-  
+
   // SpcFORK - https://replit.com/@SpcFORK/SpcFORK?v=1
   // © 2023 SpcFORK
-  
+
   get_connected,
   get_back_resources,
   get_front_resources
