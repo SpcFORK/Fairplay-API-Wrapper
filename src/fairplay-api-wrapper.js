@@ -165,6 +165,10 @@ async function get_resources(endp) {
 }
 
 // @ SEMI-METHODS
+function contains(str, substr) {
+  return str.indexOf(substr) > -1;
+}
+
 async function get_connected() {
   let res = await get_resources(ENDPOINTS.get_connected);
   return res
@@ -186,20 +190,12 @@ async function get_front_resources() {
     let n_ = machines[i]?.name?.toLowerCase?.() || ''
     let fn_ = '';
     
-    // Name contains Shard?
-    if (n_.includes('shard')) {
-      fn_ = 'shard'
-    }
-
-    else if (machines[i].name.includes('load balancer')) {
-      fn_ = 'loadbalancer'
-    }
-
-    else if (machines[i].name.includes('batch processing server')) {
-      fn_ = 'batchprocessingserver'
-    }
-
+    if (contains(n_, 'shard')) fn_ = 'shard';
+    else if (contains(n_, 'load balancer')) fn_ = 'loadbalancer';
+    else if (contains(n_, 'batch processing server')) fn_ = 'batchprocessingserver';
+    
     else {
+      console.log(machines[i])
       throw new Error('Unseen/New Machine Type, Contact Developer, may be error.')
     }
 
