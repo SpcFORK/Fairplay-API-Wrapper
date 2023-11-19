@@ -163,7 +163,7 @@ async function get_resources(endp) {
 
       return res.data
     } else {
-      const res = fetch(endp.url, {
+      const res = await fetch(endp.url, {
         method: endp.method,
         headers: {
           'User-Agent': USER_AGENT,
