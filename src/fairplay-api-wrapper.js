@@ -22,6 +22,10 @@ const
         "online": typeof true,
       })
     }
+
+    set(data) {
+      return Object.assign(this, data)
+    }
   },
 
   FP_Shard = class extends FP_Core_Instance {
@@ -201,8 +205,12 @@ async function get_front_resources() {
       arr.push(inst)
     }
   }
+
+  let newObj = {
+    machines: arr
+  }
   
-  return res
+  return newObj
 }
 
 // @ EXPORTS
