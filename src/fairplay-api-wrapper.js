@@ -163,19 +163,24 @@ async function get_resources(endp) {
 
       return res.data
     } else {
-      const res = await fetch(endp.url, {
+      let fetchRes = {
         method: endp.method,
         headers: {
           'User-Agent': USER_AGENT,
           'Content-Type': 'application/json'
         },
         mode: 'cors'
-      })
+      }
+
+      const res = await fetch(endp.url, fetchRes)
 
       let _json = await res.json()
 
       return Object.assign(_json, {
-        request_made: res
+        request_made: {
+          ...res,
+          request_headers: fetchRes,
+        }
       })
     }
 
