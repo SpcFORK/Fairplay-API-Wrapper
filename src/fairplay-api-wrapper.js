@@ -172,7 +172,11 @@ async function get_resources(endp) {
         mode: 'cors'
       })
 
-      return res
+      let _json = await res.json()
+
+      return Object.assign(_json, {
+        request_made: res
+      })
     }
 
   } catch (err) {
