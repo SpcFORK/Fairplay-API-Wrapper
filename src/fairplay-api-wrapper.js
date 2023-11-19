@@ -173,6 +173,35 @@ async function get_back_resources() {
 
 async function get_front_resources() {
   let res = await get_resources(ENDPOINTS.front_resources);
+
+  // Machine Arr; We type using classes
+  let machines = res.machines;
+  let arr = [];
+
+  for (let i = 0; i < machines.length; i++) {
+    let n_ = machines[i]?.name?.toLowerCase?.() || ''
+    
+    // Name contains Shard?
+    if (n_.includes('shard')) {
+      // console.log(machines[i])
+      let inst = ENDPOINTS.front_resources.buildInstance('shard');
+      inst.set(machines[i])
+      arr.push(inst)
+    }
+
+    else if (machines[i].name.includes('load balancer')) {
+      let inst = ENDPOINTS.front_resources.buildInstance('loadbalancer');
+      inst.set(machines[i])
+      arr.push(inst)
+    }
+
+    else if (machines[i].name.includes('batch processing server')) {
+      let inst = ENDPOINTS.front_resources.buildInstance('batchprocessingserver');
+      inst.set(machines[i])
+      arr.push(inst)
+    }
+  }
+  
   return res
 }
 
