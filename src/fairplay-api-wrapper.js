@@ -11,6 +11,8 @@ const
     front: 'https://economyplus.solutions/api/'
   },
 
+  RATELIMIT = 500; // Req's per 1s
+
   FP_Core_Instance = class {
     constructor() {
       return this.set({
@@ -179,36 +181,98 @@ async function get_back_resources() {
   return res
 }
 
+function handle_machinesArr(machinesArr = []) {
+  let arr = [];
+  
+  for (let i = 0; i < machinesArr.length; i++) {
+    let n_ = machinesArr[i]?.name?.toLowerCase?.() || ''
+    let fn_ = '';
+
+    if (contains(n_, 'shard')) fn_ = 'shard';
+    else if (contains(n_, 'load balancer')) fn_ = 'loadbalancer';
+    else if (contains(n_, 'batch processing server')) fn_ = 'batchprocessingserver';
+
+    else {
+      console.log(machinesArr[i])
+      throw new Error('Unseen/New Machine Type, Contact Developer, may be error.')
+    }
+
+    let inst = ENDPOINTS.front_resources.buildInstance(fn_);
+    inst.set(machinesArr[i])
+    arr.push(inst)
+  }
+
+  return arr
+}
+
 async function get_front_resources() {
   let res = await get_resources(ENDPOINTS.front_resources);
 
   // Machine Arr; We type using classes
   let machines = res.machines;
-  let arr = [];
-
-  for (let i = 0; i < machines.length; i++) {
-    let n_ = machines[i]?.name?.toLowerCase?.() || ''
-    let fn_ = '';
-    
-    if (contains(n_, 'shard')) fn_ = 'shard';
-    else if (contains(n_, 'load balancer')) fn_ = 'loadbalancer';
-    else if (contains(n_, 'batch processing server')) fn_ = 'batchprocessingserver';
-    
-    else {
-      console.log(machines[i])
-      throw new Error('Unseen/New Machine Type, Contact Developer, may be error.')
-    }
-
-    let inst = ENDPOINTS.front_resources.buildInstance(fn_);
-    inst.set(machines[i])
-    arr.push(inst)
-  }
 
   let newObj = {
-    machines: arr
+    machines: handle_machinesArr(machines)
   }
 
   return newObj
+}
+
+class RequestQueue {
+  constructor(cooldown) {
+    this.cooldown = cooldown;
+    this.queue = [];
+    this.ready = true;
+  }
+
+  enqueue(queryFunction) {
+    this.queue.push(queryFunction);
+    this.tryToProcessNextQuery();
+  }
+
+  pause() {
+    this.ready = false;
+  }
+
+  resume() {
+    this.ready = true;
+    this.tryToProcessNextQuery();
+  }
+
+  tryToProcessNextQuery() {
+    if (!this.ready) setTimeout(() => this.tryToProcessNextQuery(), this.cooldown); 
+    
+    else if (this.queue.length > 0) {
+      this.ready = false;
+      const queryFunction = this.queue.shift();
+      queryFunction().finally(() => {
+        setTimeout(() => {
+          this.ready = true;
+          this.tryToProcessNextQuery();
+        }, this.cooldown);
+      });
+    }
+  }
+}
+
+class RateLimiter {
+  constructor(limit, interval) {
+    this.limit = limit; // Limit for number of calls
+    this.interval = interval; // Interval in milliseconds
+    this.callTimes = []; // Array to keep track of call timestamps
+  }
+
+  checkLimit(callback) {
+    const now = Date.now();
+    this.callTimes = this.callTimes.filter(time => now - time < this.interval);
+
+    if (this.callTimes.length < this.limit) {
+      this.callTimes.push(now);
+      callback();
+    } else {
+      console.warn('Rate limit exceeded. Try again later.');
+    }
+  }
 }
 
 // @ EXPORTS
@@ -219,5 +283,11 @@ module.exports = {
 
   get_connected,
   get_back_resources,
-  get_front_resources
+  get_front_resources,
+
+  RequestQueue,
+  ENDPOINTS,
+  USER_AGENT,
+  RateLimiter
+  
 }
