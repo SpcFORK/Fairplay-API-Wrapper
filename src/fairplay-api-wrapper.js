@@ -199,6 +199,10 @@ async function get_front_resources() {
       fn_ = 'batchprocessingserver'
     }
 
+    else {
+      throw new Error('Unseen/New Machine Type, Contact Developer, may be error.')
+    }
+
     let inst = ENDPOINTS.front_resources.buildInstance(fn_);
     inst.set(machines[i])
     arr.push(inst)
