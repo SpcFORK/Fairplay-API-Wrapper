@@ -3,7 +3,7 @@
 
 const
   // @ DEPS
-  axios = require('axios'),
+  axios = (globalThis.require ? require('axios') : false),
 
   // @ DATA
   ENDURLS = {
@@ -149,17 +149,31 @@ const
 // @ FUNCTIONS
 async function get_resources(endp) {
   try {
-    const res = await axios.request({
-      method: endp.method,
-      url: endp.url,
-      responseType: 'json',
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json'
-      }
-    })
 
-    return res.data
+    if (axios) {
+      const res = await axios.request({
+        method: endp.method,
+        url: endp.url,
+        responseType: 'json',
+        headers: {
+          'User-Agent': USER_AGENT,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      return res.data
+    } else {
+      const res = fetch(endp.url, {
+        method: endp.method,
+        headers: {
+          'User-Agent': USER_AGENT,
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors'
+      })
+
+      return res
+    }
 
   } catch (err) {
     console.log(err)
@@ -183,7 +197,7 @@ async function get_back_resources() {
 
 function handle_machinesArr(machinesArr = []) {
   let arr = [];
-  
+
   for (let i = 0; i < machinesArr.length; i++) {
     let n_ = machinesArr[i]?.name?.toLowerCase?.() || ''
     let fn_ = '';
@@ -240,8 +254,8 @@ class RequestQueue {
   }
 
   tryToProcessNextQuery() {
-    if (!this.ready) setTimeout(() => this.tryToProcessNextQuery(), this.cooldown); 
-    
+    if (!this.ready) setTimeout(() => this.tryToProcessNextQuery(), this.cooldown);
+
     else if (this.queue.length > 0) {
       this.ready = false;
       const queryFunction = this.queue.shift();
@@ -276,7 +290,7 @@ class RateLimiter {
 }
 
 // @ EXPORTS
-module.exports = {
+const __EXP__ = {
 
   // SpcFORK - https://replit.com/@SpcFORK/SpcFORK?v=1
   // © 2023 SpcFORK
@@ -289,5 +303,10 @@ module.exports = {
   ENDPOINTS,
   USER_AGENT,
   RateLimiter
-  
+
 }
+
+// @ Runtime Check
+globalThis.module
+  ? module.exports = __EXP__
+  : globalThis.fpAPI = __EXP__
