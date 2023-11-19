@@ -13,7 +13,7 @@ const
 
   FP_Core_Instance = class {
     constructor() {
-      return Object.assign(this, {
+      return this.set({
         "name": typeof "",
         "cpu": typeof 1,
         "ram": typeof 1,
@@ -31,7 +31,7 @@ const
   FP_Shard = class extends FP_Core_Instance {
     constructor() {
       super()
-      return Object.assign(this, {
+      return this.set({
         "slotsavailable": typeof 1,
         "slotsused": typeof 1
       })
@@ -41,7 +41,7 @@ const
   FP_Load_Balancer = class extends FP_Core_Instance {
     constructor() {
       super()
-      return Object.assign(this, {
+      return this.set({
         "acceptingnewbots": typeof true,
         "botsonline": typeof 1,
         "connectionavailable": typeof 1
@@ -53,7 +53,7 @@ const
   FP_Batch_Processing_Server = class extends FP_Core_Instance {
     constructor() {
       super()
-      return Object.assign(this, {
+      return this.set({
         "calculationsavailable": typeof 1,
         "calculationsused": typeof 1
       })
