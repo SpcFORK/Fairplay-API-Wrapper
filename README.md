@@ -1,6 +1,6 @@
 # Fairplay-API-Wrapper
 
-This is a JavaScript wrapper for the SpcFORK API that simplifies the process of interacting with various endpoints provided by `economyplus.solutions`.
+This is a JavaScript wrapper for the Fairplay (EconomyPlus) API that simplifies the process of interacting with various endpoints provided by `economyplus.solutions`.
 
 ## Features
 
