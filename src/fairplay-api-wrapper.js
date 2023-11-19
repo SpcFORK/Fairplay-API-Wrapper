@@ -11,7 +11,7 @@ const
     front: 'https://economyplus.solutions/api/'
   },
 
-  RATELIMIT = 500; // Req's per 1s
+  RATELIMIT = 500, // Req's per 1s
 
   FP_Core_Instance = class {
     constructor() {
